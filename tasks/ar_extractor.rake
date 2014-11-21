@@ -3,10 +3,9 @@ namespace :db do
     desc "Extract DB to YAML fixtures."
     task :extract => :environment do
       fixtures_dir = db_connection
-
       tables = {}
       table = []
-      open("#{RAILS_ROOT}/db/schema.rb") do |file|
+      open("#{Rails.root.to_s}/db/schema.rb") do |file|
         while line = file.gets
           next if line.blank?
           case line
@@ -38,7 +37,7 @@ namespace :db do
 
     task :convert => :environment do
       desc "Convert data from legacy schema to another."
-      CONFIG_FILE = "#{RAILS_ROOT}/config/tables.yml"
+      CONFIG_FILE = "#{Rails.root.to_s}/config/tables.yml"
       if    ENV["DB"].nil?            then raise ArgumentError, "Set argument DB.\ne.g. rake db:fixtuers:convert DB=foo"
       elsif !File.exist?(CONFIG_FILE) then raise IOError      , "Doesn't exist #{CONFIG_FILE}"
       end
@@ -97,7 +96,7 @@ end
 private
 def db_connection(db = nil)
   ActiveRecord::Base.establish_connection(db)
-  fixtures_dir = RAILS_ROOT + "/"
+  fixtures_dir = Rails.root.to_s + "/"
   fixtures_dir += File.exist?(fixtures_dir + "spec") && !exist_module? ? "spec" : "test"
   fixtures_dir += "/fixtures/"
   FileUtils.mkdir_p(fixtures_dir)
